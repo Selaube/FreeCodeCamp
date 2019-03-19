@@ -186,9 +186,13 @@ col 的上一层不一定是 row，二者没有先后关系。可以将 col 放�
 </div>
 ```
 
-#### 问题
+##### 导航栏随页面滚动
+
+一开始遇到了以下的问题：
 
 使用 Bootstrap 的 navs 时，像 navbar 的 class 中添加 pills 属性可以让按钮在被点击后变色。为了达到这个效果，还要在每个 nav 中添加 toggle 属性，这样每点下一个按钮就会变色。
 
 然而这时，点击按钮就无法跳转到指定位置，只能变色。这个问题难以解决，于是舍弃了这个效果。
+
+后来在 Bootstrap 文档中看到了 [scrollspy](https://getbootstrap.com/docs/4.3/components/scrollspy/)，试了之后发现应该用它解决问题。具体做法类似该页面中“Example in navbar”的示例，将 `data-spy="scroll" data-target="#navbar-example2" data-offset="0"` 的属性添加到 body，并将 data-target 指向 navbar 的 id。
 
