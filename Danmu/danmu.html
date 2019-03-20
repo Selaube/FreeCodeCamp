@@ -9,26 +9,39 @@
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   <title>Danmu</title>
+
+  <style>
+    .danmu {
+      position: absolute;
+      font: SimHei;
+      font-weight: 500;
+      right: 20px;
+    }
+
+    #pool {
+      position: relative;
+      height: 400px;
+      overflow: hidden;
+    }
+  </style>
 </head>
 
 <body>
   <div class="container-fluid">
-    <div class="row m-3 border">
-      <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-    </div>
-    <form class="col-4 offset-4 offset-4">
+    <div id="pool" class="row m-3 p-2 border"></div>
+    <div class="col-4 offset-4 offset-4">
       <div class="form-row mx-5">
-        <input type="text" class="form-control form-control-sm" placeholder="说点什么？">
+        <input id="input" type="text" class="form-control form-control-sm" placeholder="说点什么？">
       </div>
       <div class="form-row my-3 mx-5">
         <div class="col ml-5">
-          <button type="button" class="btn btn-sm btn-outline-danger btn-block">发射</button>
+          <button id="btn-fire" type="button" class="btn btn-sm btn-outline-danger btn-block">发射</button>
         </div>
         <div class="col mr-5">
-          <button type="button" class="btn btn-sm btn-outline-secondary btn-block">清屏</button>
+          <button id="btn-clear" type="button" class="btn btn-sm btn-outline-secondary btn-block">清屏</button>
         </div>
       </div>
-    </form>
+    </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -40,6 +53,44 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
+
+  <script>
+    $(document).ready(function () {
+      var poolHtml = $("#pool").html();
+      function danmuFire(danmu) {
+        oneDanmu(danmu);
+      }
+      // 每条弹幕从出现到消失的过程
+      function oneDanmu(danmu) {
+        var randomColor = "#" + Math.floor(Math.random() * 1000);
+        var randomTop = Math.floor(Math.random() * 350);
+        var randomFontsize = Math.floor(Math.random() * 10) + 15;
+        var styleCss = "color: " + randomColor + "; top: " + randomTop + "px; font-size: " + randomFontsize + "px";
+        var danmuHtml = "<div class='danmu' style='" + styleCss + "'>" + danmu + "</div>";
+        $("#pool").append(danmuHtml);
+      }
+      // 生成a~b秒的随机时间
+      function randomTime(a, b) {
+        return (Math.floor(Math.random() * (b - a)) + a) * 1000;
+      }
+      $("#btn-fire").click(function () {
+        // 清空输入框并将其中的文字变成弹幕发送
+        var danmu = $("#input").val();
+        danmuFire(danmu);
+      });
+      $("#btn-clear").click(function () {
+        // 清除弹幕
+        $("#pool").html(poolHtml);
+      });
+      $("#input").keydown(function (event) {
+        // 在文本框回车，清空并发射弹幕
+        if (event.which == 13) {
+          danmuFire();
+        }
+      });
+    });
+  </script>
+
 </body>
 
 </html>
