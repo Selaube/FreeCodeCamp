@@ -60,10 +60,20 @@
     $(document).ready(function () {
       var poolHtml = $("#pool").html();
       var danmuCount = 0;
+      var fireCount = 0;
+      intervalArr = [];
       function danmuFire(danmu) {
         var danmu = $("#input").val();
         oneDanmu(danmu);
+        intervalArr[fireCount] = setInterval(function () {
+          oneDanmu(danmu);
+        }, randomTime(2, 4));
+        setTimeout(function () {
+          clearInterval(intervalArr.shift());
+          fireCount--;
+        }, 10000);
         $("#input").val("");
+        fireCount++;
       }
       // 每条弹幕从出现到消失（其实是停在屏幕外面，直到点击清屏才会被清除）的过程
       function oneDanmu(danmu) {
@@ -78,6 +88,10 @@
         var distance = "-=" + ($("#pool").width() + $("#" + id).width() + 20) + "px";
         $("#" + id).animate({ left: distance }, 10000, "linear");
       }
+      // 生成a~b秒的随机时间
+      function randomTime(a, b) {
+        return (Math.floor(Math.random() * (b - a)) + a) * 1000;
+      }
       $("#btn-fire").click(function () {
         // 清空输入框并将其中的文字变成弹幕发送
         danmuFire();
@@ -85,7 +99,9 @@
       $("#btn-clear").click(function () {
         // 清除弹幕
         $("#pool").html(poolHtml);
+        intervalArr.forEach(clearInterval);
         danmuCount = 0;
+        fireCount = 0;
       });
       $("#input").keydown(function (event) {
         // 在文本框回车，清空并发射弹幕
