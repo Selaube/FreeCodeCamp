@@ -11,45 +11,152 @@
     integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
   <style>
-    .jumbotron {
+    .quotebox {
       background-color: white;
-      width: 70%;
+      width: 60%;
+      position: relative;
+      top: 150px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 3px;
+      font-size: 20px;
     }
 
-    .cite {
-      float: right;
+    .tab {
+      background-color: #324;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 7px 15px 7px 15px;
+    }
+
+    p {
+      font-size: 24px;
+      font-family: STSong, "华文宋体", SimSong, "宋体";
     }
   </style>
+
   <title>Random Quote Machine</title>
 </head>
 
 <body style="background-color: #324">
   <div class="container p-5">
-    <div class="jumbotron">
-      <div class="row">
+    <div class="quotebox p-5">
+      <div class="row justify-content-center px-5">
         <blockquote class="text-center">
-          this is a quote.
-          <cite class="mt-3">cite</cite>
+          <i class="fas fa-quote-left fa-pull-left" style="font-size: 28px"></i>
+          <p id="hitokoto">Loading...</p>
         </blockquote>
       </div>
-      <div class="row">
-        <div class="col"><i class="fab fa-github"></i></div>
-        <div class="col"><button>new quote</button></div>
+      <div class="row justify-content-end px-5">
+        <p id="from"></p>
+      </div>
+      <div class="row mx-2 mt-4">
+        <div class="col-auto mr-auto">
+          <button id="share1" class="tab" title="分享到微博">
+            <i class="far fa-eye" style="color: white"></i></button>
+          <button id="share2" class="tab" title="分享到QQ空间">
+            <i class="far fa-star"></i>
+          </button>
+        </div>
+        <div class="col-auto">
+          <button id="new" class="tab">下一个</button>
+        </div>
       </div>
     </div>
-  </div>
+    <div class="row justify-content-center" style="color: white; margin-top: 180px">by cedric</div>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        var sentence = "";
+        var author = "";
+        changePage();
+        $(".tab").mouseover(function () {
+          $(this).css("opacity", "0.8");
+        });
+        $(".tab").mouseout(function () {
+          $(this).css("opacity", "1.0");
+        });
+        $("#new").click(function () {
+          changePage();
+        });
+        $("#share1").click(function () {
+          var link = "http://service.weibo.com/share/share.php?appkey=2841902482&title=" + sentence + " —— " +
+            author;
+          window.open(link);
+        });
+        $("#share2").click(function () {
+          var link =
+            "http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https%3A%2F%2Fhitokoto.cn%2F&desc=" +
+            sentence +
+            " —— " + author + "&summary=我发现了一个好句子" + "&title=句子分享";
+          window.open(link);
+        });
+
+        // 改变句子和颜色
+        function changePage() {
+          getHitokoto();
+          var rgbCode = randomColor();
+          $("body").css("background-color", rgbCode);
+          $(".tab").css("background-color", rgbCode);
+          $(".fa-quote-left").css("color", rgbCode);
+        }
+
+        function getHitokoto() {
+          $.get("https://v1.hitokoto.cn/", function (json) {
+            sentence = json.hitokoto;
+            author = json.from;
+            var pattern = new RegExp("[A-Za-z]+");
+            // 这个if解决句子过短时自动换行的问题。
+            if (sentence.length < 20) {
+              $("blockquote").css("white-space", "nowrap");
+            } else if (sentence.length < 35 && pattern.test(sentence)) {
+              $("blockquote").css("white-space", "nowrap");
+            } else {
+              $("blockquote").css("white-space", "normal");
+            }
+            $("#hitokoto").text(sentence);
+            $("#from").text(" —— " + json.from);
+          });
+        }
+
+        // 生成一种不太浅的随机颜色，规律是rgb代码中至少有一个数字小于120
+        function randomColor() {
+          var c = Math.random() * 3;
+          var color1 = Math.floor(Math.random() * 120);
+          var color2 = Math.floor(Math.random() * 255);
+          var color3 = Math.floor(Math.random() * 255);
+          if (c < 1) {
+            var rgbCode = "rgb(" + color1 + ", " + color2 + ", " + color3 + ")";
+          } else if (c < 2) {
+            var rgbCode = "rgb(" + color2 + ", " + color1 + ", " + color3 + ")";
+          } else {
+            var rgbCode = "rgb(" + color3 + ", " + color2 + ", " + color1 + ")";
+          }
+          return rgbCode;
+        }
+      });
+    </script>
 </body>
 
-<footer class="text-center">by cedric</footer>
+<!--
+  分享到微博：http://service.weibo.com/share/share.php?appkey=2841902482&title=<text>
+    <text>是要填入的内容，借用了B站的appkey
+  分享到QQ空间：http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https%3A%2F%2Fhitokoto.cn%2F&desc=content&summary=summary&title=title
+
+  国内网站的icon可以从阿里图标库下载，放在本地导入，但在线显示不太方便，所以在这分别用font-awesome的“eye”和“star”图标代替微博和QQ空间。
+-->
 
 </html>
